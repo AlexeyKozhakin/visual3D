@@ -39,3 +39,5 @@ def transorm_to_model_data(df, num_points_per_cloud=1024, batch_size = 8):
         # Определение меток для облаков точек на основе большинства
         cloud_labels = get_majority_label(cloud_labels, num_batches*batch_size)  # Метки для облаков точек
         return data_normalized, cloud_labels
+
+

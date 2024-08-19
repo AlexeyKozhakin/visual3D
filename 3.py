@@ -20,51 +20,6 @@ def data_loader_ply(ply_file_paths):
     df = pd.concat(list_cloud_datasets, ignore_index=True)
     return df
 
-paths = 'data/Toronto_3D/'
-ply_files = ['L002.ply']  # Замените на ваши пути
-ply_file_paths = [paths + file for file in ply_files]
-
-df = data_loader_ply(ply_file_paths)
-df2 = df.copy()
-# Найдем разницу между максимальным и минимальным значениями в df
-shift_value = df['x'].max() - df['x'].min()
-
-# Смещаем значения в df2 на shift_value
-df2['x'] += shift_value
-df = pd.concat([df,df2], ignore_index=True)
-
-dn = 200
-N = df.shape[0]
-
-color_map = colors_from_labels(df['scalar_Label'])
-data = []
-classes_list = [
-    'Unclassified',
-    'Ground',
-    'Road_markings',
-    'Natural',
-    'Building',
-    'Utility_line',
-    'Pole',
-    'Car',
-    'Fence'
-]
-# Создание объекта визуализации для каждого класса
-for label, color in color_map.items():
-    class_mask = df['scalar_Label'] == label
-    trace = go.Scatter3d(
-        x=df['x'].iloc[:N:dn][class_mask],
-        y=df['y'].iloc[:N:dn][class_mask],
-        z=df['z'].iloc[:N:dn][class_mask],
-        mode='markers',
-        marker=dict(
-            size=5,
-            color=color,
-            opacity=0.8
-        ),
-        name=f'{classes_list[int(label)]}'  # Имя в легенде
-    )
-    data.append(trace)
 
 # Функция для вращающейся анимации
 def visualize_rotate(data):
@@ -106,6 +61,54 @@ def visualize_rotate(data):
                     )
     return fig
 
-# Визуализация с вращением
-fig = visualize_rotate(data)
-fig.show()
+
+if __name__ == '__main__':
+        paths = 'data/Toronto_3D/'
+        ply_files = ['L004.ply']  # Замените на ваши пути
+        ply_file_paths = [paths + file for file in ply_files]
+
+        df = data_loader_ply(ply_file_paths)
+        df2 = df.copy()
+        # Найдем разницу между максимальным и минимальным значениями в df
+        shift_value = df['x'].max() - df['x'].min()
+
+        # Смещаем значения в df2 на shift_value
+        df2['x'] += shift_value
+        df = pd.concat([df,df2], ignore_index=True)
+
+        dn = 200
+        N = df.shape[0]
+
+        color_map = colors_from_labels(df['scalar_Label'])
+        data = []
+        classes_list = [
+            'Unclassified',
+            'Ground',
+            'Road_markings',
+            'Natural',
+            'Building',
+            'Utility_line',
+            'Pole',
+            'Car',
+            'Fence'
+        ]
+        # Создание объекта визуализации для каждого класса
+        for label, color in color_map.items():
+            class_mask = df['scalar_Label'] == label
+            trace = go.Scatter3d(
+                x=df['x'].iloc[:N:dn][class_mask],
+                y=df['y'].iloc[:N:dn][class_mask],
+                z=df['z'].iloc[:N:dn][class_mask],
+                mode='markers',
+                marker=dict(
+                    size=5,
+                    color=color,
+                    opacity=0.8
+                ),
+                name=f'{classes_list[int(label)]}'  # Имя в легенде
+            )
+            data.append(trace)
+
+        # Визуализация с вращением
+        fig = visualize_rotate(data)
+        fig.show()
